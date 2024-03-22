@@ -1,5 +1,6 @@
 package org.openapi4j.schema.validator;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.openapi4j.core.validation.ValidationResult;
 import org.openapi4j.core.validation.ValidationResults;
 
@@ -60,7 +61,16 @@ public final class ValidationData<V> {
    * @param result    validation result to append.
    * @param msgArgs   message arguments to get formatted message.
    */
-  public void add(ValidationResults.CrumbInfo crumbInfo, ValidationResult result, Object... msgArgs) {
+  public void add(ValidationResults.CrumbInfo crumbInfo,
+                  ValidationResult result,
+                  JsonNode jsonNode,
+                  Object... msgArgs) {
+    validationResults.add(crumbInfo, result, jsonNode, msgArgs);
+  }
+
+  public void add(ValidationResults.CrumbInfo crumbInfo,
+                  ValidationResult result,
+                  Object... msgArgs) {
     validationResults.add(crumbInfo, result, msgArgs);
 
   }

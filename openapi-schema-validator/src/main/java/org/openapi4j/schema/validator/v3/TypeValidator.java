@@ -45,7 +45,7 @@ class TypeValidator extends BaseJsonValidator<OAI3> {
       }
 
       if (!TYPE_NULL.equals(valueType)) {
-        validation.add(CRUMB_INFO, ERR, type, valueType);
+        validation.add(CRUMB_INFO, ERR, valueNode, type, valueType);
       }
     }
 

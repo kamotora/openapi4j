@@ -1,5 +1,7 @@
 package org.openapi4j.core.validation;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,6 +36,24 @@ public class ValidationResults implements Serializable {
    */
   public void add(ValidationResult result, Object... msgArgs) {
     items.add(new ValidationItem(result, crumbs, msgArgs));
+    if (result.severity().gt(validationSeverity)) {
+      validationSeverity = result.severity();
+    }
+  }
+
+  /**
+   * Add a result.
+   *
+   * @param crumbInfo path item to add the result.
+   * @param result    validation result to append.
+   * @param msgArgs   message arguments to get formatted message.
+   */
+  public void add(CrumbInfo crumbInfo,
+                  ValidationResult result,
+                  JsonNode invalidNode,
+                  Object... msgArgs) {
+
+    items.add(new ValidationItem(result, crumbs, crumbInfo, invalidNode, msgArgs));
     if (result.severity().gt(validationSeverity)) {
       validationSeverity = result.severity();
     }
@@ -226,14 +246,17 @@ public class ValidationResults implements Serializable {
     private final List<CrumbInfo> crumbs;
 
     ValidationItem(ValidationResult result, Collection<CrumbInfo> crumbs, Object... msgArgs) {
-      this(result, crumbs, null, msgArgs);
+      this(result, crumbs, null, null, msgArgs);
     }
 
-    ValidationItem(ValidationResult result, Collection<CrumbInfo> crumbs, CrumbInfo crumbInfo, Object... msgArgs) {
+    ValidationItem(ValidationResult result, Collection<CrumbInfo> crumbs,
+                   CrumbInfo crumbInfo,
+                   JsonNode invalidNode,
+                   Object... msgArgs) {
       super(
         result.severity(),
         result.code(),
-        (msgArgs.length != 0) ? String.format(result.message(), msgArgs) : result.message());
+        (msgArgs.length != 0) ? String.format(result.message(), msgArgs) : result.message(), invalidNode);
 
       this.crumbs = new ArrayList<>(crumbs);
       if (crumbInfo != null) {
